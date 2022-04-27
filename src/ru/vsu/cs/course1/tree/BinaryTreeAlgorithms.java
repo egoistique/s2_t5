@@ -21,94 +21,54 @@ public class BinaryTreeAlgorithms {
 //поддерева. Путь задается в виде строки из букв "L" (если на очередном шаге от узла мы
 //идем к левому потомку) и "R" ( – если к правому потомку).
 
-//    public static <T> void task(BinaryTree.TreeNode<T> treeNode, Visitor<T> visitor) {
-//
-//        class Inner {
-//            void postOrderVisit(BinaryTree.TreeNode<T> node, Visitor<T> visitor, int level) {
-//                List<String> pathes = new ArrayList<>();
-//                int sum = 0;
-//                int maxSum = 0;
-//                String path = "";
-//                if (node == null) {
-//                    return;
-//                }
-//                postOrderVisit(node.getLeft(), visitor, level + 1);
-//                sum += node.getValue();
-//                if (sum > maxSum){
-//                    maxSum = sum;
-//                }
-//                postOrderVisit(node.getRight(), visitor, level + 1);
-//                sum += node.getValue();
-//                if (sum > maxSum){
-//                    maxSum = sum;
-//                }
-//                visitor.visit(node.getValue(), level);
-//                sum += node.getValue();
-//                if (sum > maxSum){
-//                    maxSum = sum;
-//                }
-//            }
-//        }
-//        new Inner().postOrderVisit(treeNode, visitor, 0);
-//    }
-
     public static class Answer  <T>{
         public int v;
         public BinaryTree.TreeNode<T> root;
-        Answer(int a, BinaryTree.TreeNode<T> root) {
+        public List<BinaryTree.TreeNode<T>> roots;
+
+
+        Answer(int a, BinaryTree.TreeNode<T> r, List<BinaryTree.TreeNode<T>> ro) {
             v = a;
-            root = root;
+            root = r;
+            roots = ro;
         }
     }
-    static class Route {
-        String v;
-        Route(String a) {
-            v = a;
-        }
-    }
-    public static <T>  int findLargestSubtreeSumUtil(BinaryTree.TreeNode<T> root, Answer ans) {
-        // Если текущий узел пуст вернуть 0 в родительский узел.
+
+    public static <T>  int findLargestSubtreeSumUtil(BinaryTree.TreeNode<T> root, Answer ans, List<BinaryTree.TreeNode<T>> roots) {
         if (root == null) {
             return 0;
         }
 
-        // поддерево сумма укорененная на текущем узле.
-        int currSum = (int) root.getValue() + findLargestSubtreeSumUtil(root.getLeft(), ans) + findLargestSubtreeSumUtil(root.getRight(), ans);
+        int currSum = (int) root.getValue() + findLargestSubtreeSumUtil(root.getLeft(), ans, roots) + findLargestSubtreeSumUtil(root.getRight(), ans, roots);
 
-        // Обновить ответ, если текущее поддерево сумма больше, чем ответ до сих пор.
-        //ans.v = Math.max(ans.v, currSum);
         if (currSum > ans.v){
+            roots.clear();
             ans.v = currSum;
             ans.root = root;
+            roots.add(root);
+        } else if (currSum == ans.v){
+            roots.add(root);
         }
 
-        // Возвращаем текущее поддерево сумма к его родительскому узлу.
         return currSum;
     }
 
 
-// Функция для поиска
-// самая большая сумма поддерева.
-
     public static  <T>  Answer findLargestSubtreeSum(BinaryTree.TreeNode<T> root) {
-        // Если дерево не существует, тогда ответ 0.
+        List<BinaryTree.TreeNode<T>> roots = new ArrayList<>();
+        roots.add(root);
         if (root == null) {
             return null;
         }
-        // Переменная для хранения максимальная сумма поддерева.
-        Answer ans = new Answer(-9999999, root);
-        // вызов рекурсивной функции найти максимальную сумму поддерева.
-        findLargestSubtreeSumUtil(root, ans);
+        Answer ans = new Answer(-9999999, root, roots);
+
+        findLargestSubtreeSumUtil(root, ans, roots);
+
+
         return ans;
     }
-//поиск пути
-    public static <T> String route(BinaryTree.TreeNode<T> root){
-        Route route = new Route("");
-        return route.v;
-    }
 
 
-    // Возвращает true, если есть путь от root к данному узлу. Это также населяет 'arr' с заданным путем
     public static <T> boolean hasPath(BinaryTree.TreeNode<T> root, ArrayList<String> arr, BinaryTree.TreeNode<T> x){
         if (root==null)
             return false;
@@ -124,24 +84,14 @@ public class BinaryTreeAlgorithms {
             arr.add("R");
             return true;
         }
-//        arr.add(String.valueOf(root.data));
-
-//        // обязательный узел не лежит ни в левое или правое поддерево текущего узла
-//        // Таким образом, удаляем значение текущего узла из 'arr'и возвращаем false
-//        arr.remove(arr.size() - 1);
         return false;
     }
 
-    // функция для печати пути от корня до данный узел, если узел лежит в двоичном дереве
     public static <T> ArrayList<String> printPath(BinaryTree.TreeNode<T> root, BinaryTree.TreeNode<T> x) {
         ArrayList<String> arr = new ArrayList<>();
 
         if (hasPath(root, arr, x)){
             Collections.reverse(arr);
-            for (int i = 0; i < arr.size() - 1; i++) {
-                System.out.print(arr.get(i) + "->");
-            }
-            System.out.print(arr.get(arr.size() - 1));
             return arr;
         }
 
@@ -151,8 +101,9 @@ public class BinaryTreeAlgorithms {
 
 //-8 (-6 (4 (-5), 6), 5 (, 5 (-2, 8)))
 //-8 (-6 (4 (-5, 5), 6 (-5, 5)), -500 (-600 (-5, 5000), -50 (-2, 800)))
-
-
+//-8 (-6 (4 (-5, 5), -6000 (-5, 5000)), -500 (-600 (-5, 5000), -50 (-2, 5)))
+//-8 (-6 (4 (-5, 5000), -6000 (-5, 5000)), -500 (-600 (-5, 5000), -50 (-2, 5)))
+//-8 (-60000 ( 6000 (-5, 5000), 6000 (-5, 5000)), -500 (-600 (-5, 5000), -50 (-2, 5)))
 
 
 

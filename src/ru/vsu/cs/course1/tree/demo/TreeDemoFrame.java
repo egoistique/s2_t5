@@ -25,6 +25,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static ru.vsu.cs.course1.tree.demo.PrintPath.hasPath;
@@ -277,17 +278,28 @@ public class TreeDemoFrame extends JFrame {
             showSystemOut(() -> {
                 BinaryTreeAlgorithms.Answer ans = BinaryTreeAlgorithms.findLargestSubtreeSum(tree.getRoot());
                 System.out.println("Наибольшая сумма: " + ans.v);
-                System.out.println("Узел: " + ans.root.getValue());
 
-                ArrayList<String> arr = new ArrayList<>();
-                if (BinaryTreeAlgorithms.hasPath(tree.getRoot(), arr, ans.root)) {
-                    Collections.reverse(arr);
-                    for (int i = 0; i < arr.size() - 1; i++) {
-                        System.out.print(arr.get(i) + "->");
+                System.out.println();
+                System.out.println("Пути: ");
+
+                ArrayList<String> arr1;
+                ArrayList<String> pathes = new ArrayList<>();
+                for (int i = 0; i < ans.roots.size(); i++) {
+                    String path = "";
+                    BinaryTree.TreeNode tr = (BinaryTree.TreeNode) ans.roots.get(i);
+                    arr1 = BinaryTreeAlgorithms.printPath(tree.getRoot(), tr);
+                    if (arr1.size() == 0) {
+                        System.out.println("Вершиной поддерева является корневой узел");
                     }
-                    System.out.print(arr.get(arr.size() - 1));
+                    for (int j = 0; j < arr1.size(); j++) {
+                        path += arr1.get(j);
+                    }
+                    pathes.add(path);
                 }
-                else System.out.print("No Path");
+
+                for (Object path : pathes) {
+                    System.out.println(path + " ");
+                }
             });
         });
     }
