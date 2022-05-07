@@ -22,32 +22,28 @@ public class BinaryTreeAlgorithms {
 //идем к левому потомку) и "R" ( – если к правому потомку).
 
     public static class Answer  <T>{
-        public int v;
-        public BinaryTree.TreeNode<T> root;
+        public int max;
         public List<BinaryTree.TreeNode<T>> roots;
 
-
-        Answer(int a, BinaryTree.TreeNode<T> r, List<BinaryTree.TreeNode<T>> ro) {
-            v = a;
-            root = r;
+        Answer(int a, List<BinaryTree.TreeNode<T>> ro) {
+            max = a;
             roots = ro;
         }
     }
 
-    public static <T>  int findLargestSubtreeSumUtil(BinaryTree.TreeNode<T> root, Answer ans, List<BinaryTree.TreeNode<T>> roots) {
+    public static <T>  int findLargestSumUtil(BinaryTree.TreeNode<T> root, Answer ans) {
         if (root == null) {
             return 0;
         }
 
-        int currSum = (int) root.getValue() + findLargestSubtreeSumUtil(root.getLeft(), ans, roots) + findLargestSubtreeSumUtil(root.getRight(), ans, roots);
+        int currSum = (int) root.getValue() + findLargestSumUtil(root.getLeft(), ans) + findLargestSumUtil(root.getRight(), ans);
 
-        if (currSum > ans.v){
-            roots.clear();
-            ans.v = currSum;
-            ans.root = root;
-            roots.add(root);
-        } else if (currSum == ans.v){
-            roots.add(root);
+        if (currSum > ans.max){
+            ans.roots.clear();
+            ans.max = currSum;
+            ans.roots.add(root);
+        } else if (currSum == ans.max){
+            ans.roots.add(root);
         }
 
         return currSum;
@@ -60,10 +56,9 @@ public class BinaryTreeAlgorithms {
         if (root == null) {
             return null;
         }
-        Answer ans = new Answer(-9999999, root, roots);
+        Answer ans = new Answer(-9999999, roots);
 
-        findLargestSubtreeSumUtil(root, ans, roots);
-
+        findLargestSumUtil(root, ans);
 
         return ans;
     }
@@ -93,9 +88,7 @@ public class BinaryTreeAlgorithms {
         if (hasPath(root, arr, x)){
             Collections.reverse(arr);
             return arr;
-        }
-
-        else System.out.print("No Path");
+        } else System.out.print("No Path");
         return arr;
     }
 

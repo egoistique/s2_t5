@@ -24,11 +24,9 @@ import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
-import static ru.vsu.cs.course1.tree.demo.PrintPath.hasPath;
+//import static ru.vsu.cs.course1.tree.demo.PrintPath.hasPath;
 
 public class TreeDemoFrame extends JFrame {
     private JPanel panelMain;
@@ -277,7 +275,7 @@ public class TreeDemoFrame extends JFrame {
         buttonFind.addActionListener(actionEvent -> {
             showSystemOut(() -> {
                 BinaryTreeAlgorithms.Answer ans = BinaryTreeAlgorithms.findLargestSubtreeSum(tree.getRoot());
-                System.out.println("Наибольшая сумма: " + ans.v);
+                System.out.println("Наибольшая сумма: " + ans.max);
 
                 System.out.println();
                 System.out.println("Пути: ");
@@ -286,8 +284,8 @@ public class TreeDemoFrame extends JFrame {
                 ArrayList<String> pathes = new ArrayList<>();
                 for (int i = 0; i < ans.roots.size(); i++) {
                     String path = "";
-                    BinaryTree.TreeNode tr = (BinaryTree.TreeNode) ans.roots.get(i);
-                    arr1 = BinaryTreeAlgorithms.printPath(tree.getRoot(), tr);
+                    BinaryTree.TreeNode temp = (BinaryTree.TreeNode) ans.roots.get(i);
+                    arr1 = BinaryTreeAlgorithms.printPath(tree.getRoot(), temp);
                     if (arr1.size() == 0) {
                         System.out.println("Вершиной поддерева является корневой узел");
                     }
