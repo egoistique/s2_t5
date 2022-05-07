@@ -76,17 +76,25 @@ public class PutOrderMap<K extends Comparable<K>, V> implements DefaultNotSuppor
     }
 
     @Override
-    public Set<Entry<K, V>> entrySet() {
-        return new DefaultNotSupportedSet<Entry<K, V>>() {
-            @Override
-            public int size() {
-                return keyMap.size();
-            }
-
-            @Override
-            public Iterator<Entry<K, V>> iterator() {
-                return orderMap.values().iterator();
-            }
-        };
+    public V remove(Object key) {
+        Pair<K, V> pair = keyMap.remove(key);
+        int order = pair.order;
+        orderMap.remove(order);
+        return pair.value;
     }
+
+//    @Override
+//    public Set<Entry<K, V>> entrySet() {
+//        return new DefaultNotSupportedSet<Entry<K, V>>() {
+//            @Override
+//            public int size() {
+//                return keyMap.size();
+//            }
+//
+//            @Override
+//            public Iterator<Entry<K, V>> iterator() {
+//                return orderMap.values().iterator();
+//            }
+//        };
+//    }
 }
