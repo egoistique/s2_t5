@@ -1,17 +1,12 @@
 package ru.vsu.cs.course1;
 
-import ru.vsu.cs.course1.tree.bst.avl.AVLTreeMap;
+import ru.vsu.cs.util.dummy.DefaultNotSupportedCollection;
 import ru.vsu.cs.util.dummy.DefaultNotSupportedMap;
 import ru.vsu.cs.util.dummy.DefaultNotSupportedSet;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class PutOrderMap<K extends Comparable<K>, V> implements DefaultNotSupportedMap {
-    public PutOrderMap(K key, V value) {
-
-    }
+public class PutOrderMap<K extends Comparable<? super K>, V> implements DefaultNotSupportedMap<K, V> {
 
     private class Pair<K, V> implements Entry<K, V> {
         public K key;
@@ -49,9 +44,8 @@ public class PutOrderMap<K extends Comparable<K>, V> implements DefaultNotSuppor
 //Все операции поиска осуществляются по первому словарю, вставка / удаление
 //затрагивают два словаря одновременно, а итерация проходит по второму словарю.
 
-
-    Map<K, Pair<K, V>> keyMap = new AVLTreeMap<>();
-    Map<Integer, Pair<K, V>> orderMap = new AVLTreeMap<>();
+    Map<K, Pair<K, V>> keyMap = new TreeMap<>();
+    Map<Integer, Pair<K, V>> orderMap = new TreeMap<>();
     int order = 0;
 
     @Override
@@ -60,6 +54,7 @@ public class PutOrderMap<K extends Comparable<K>, V> implements DefaultNotSuppor
         return (pair == null) ? null : pair.value;
     }
 
+    @Override
     public V put(K key, V value) {
         Pair<K, V> pair = keyMap.get(key);
         if (pair != null) {
@@ -83,18 +78,90 @@ public class PutOrderMap<K extends Comparable<K>, V> implements DefaultNotSuppor
         return pair.value;
     }
 
-//    @Override
-//    public Set<Entry<K, V>> entrySet() {
-//        return new DefaultNotSupportedSet<Entry<K, V>>() {
-//            @Override
-//            public int size() {
-//                return keyMap.size();
-//            }
-//
-//            @Override
-//            public Iterator<Entry<K, V>> iterator() {
-//                return orderMap.values().iterator();
-//            }
-//        };
-//    }
+    @Override
+    public void putAll(Map<? extends K, ? extends V> m) {
+        m.entrySet().forEach((entry) -> {
+            keyMap.put(entry.getKey(), new Pair(entry.getKey(), entry.getValue(), order));
+            orderMap.put(order, new Pair<>(entry.getKey(), entry.getValue(), order));
+            order++;
+        });
+    }
+
+    @Override
+    public void clear() {
+        keyMap.clear();
+        orderMap.clear();
+        order = 0;
+    }
+
+    @Override
+    public Set<Entry<K, V>> entrySet() {
+        return new DefaultNotSupportedSet<Entry<K, V>>() {
+            @Override
+            public int size() {
+                return PutOrderMap.this.size();
+            }
+
+            @Override
+            public Iterator<Entry<K, V>> iterator() {
+                return (Iterator<Map.Entry<K, V>>) (Object) orderMap.values().iterator();
+            }
+        };
+    }
+
+    @Override
+    public Set<K> keySet() {
+        return new DefaultNotSupportedSet<K>() {
+            Iterator<Map.Entry<K, V>> entryIterator = entrySet().iterator();
+
+            @Override
+            public int size() {
+                return PutOrderMap.this.size();
+            }
+
+            @Override
+            public Iterator<K> iterator() {
+                return new Iterator<K>() {
+                    @Override
+                    public boolean hasNext() {
+                        return entryIterator.hasNext();
+                    }
+
+                    @Override
+                    public K next() {
+                        return entryIterator.next().getKey();
+                    }
+
+                };
+            }
+        };
+    }
+
+    @Override
+    public Collection<V> values() {
+        return new DefaultNotSupportedCollection<V>() {
+            Iterator<Map.Entry<K, V>> entryIterator = entrySet().iterator();
+
+            @Override
+            public int size() {
+                return PutOrderMap.this.size();
+            }
+
+            @Override
+            public Iterator<V> iterator() {
+                return new Iterator<V>() {
+                    @Override
+                    public boolean hasNext() {
+                        return entryIterator.hasNext();
+                    }
+
+                    @Override
+                    public V next() {
+                        return entryIterator.next().getValue();
+                    }
+
+                };
+            }
+        };
+    }
 }
